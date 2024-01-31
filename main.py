@@ -50,7 +50,7 @@ app.config['MAX_CONTENT_LENGTH']=16*1024*1024
 
 # database configuration
 # app.config['SQLALCHEMY_DATABASE_URI']='mysql://username:password@localhost/databasename'
-app.config['SQLALCHEMY_DATABASE_URI']='mssql+pyodbc://tap2023:tap2023@APINP-ELPTPMNRM\SQLEXPRESS/capstoneproject?driver=SQL Server'
+app.config['SQLALCHEMY_DATABASE_URI']='mssql+pyodbc://tap2023:tap2023@APINP-ELPTPMNRM\SQLEXPRESS/capstoneproject?driver=ODBC Driver 17 for SQL Server'
 db=SQLAlchemy(app)
 
 
@@ -81,7 +81,7 @@ class Signup(UserMixin,db.Model):
 class Blog(db.Model):
     bid=db.Column(db.Integer,primary_key=True)
     title=db.Column(db.String(50))
-    description=db.Column(db.String(50))
+    description=db.Column(db.Text())
     author=db.Column(db.String(100))
     date=db.Column(db.String(100))
     image=db.Column(db.String(1000))
@@ -116,14 +116,25 @@ def test():
         return f"Database is not connected {e} "
 
 
-@app.route("/")
+@app.route("/",methods = ['GET','POST'])
 def home():
     try:
+        print("caskbck")
+        if request.method == 'POST' and current_user.is_authenticated:
+            toggle = request.form.get('options')
+            if toggle == 'My posts':
+                blogs=Blog.query.filter_by(mail=current_user.email).all()
+                return render_template("index.html",blogs=blogs,isActive = True, allpost = False)
+            else:
+                blogs=Blog.query.all()
+                return render_template("index.html",blogs=blogs, isActive = True,  allpost = True)
+        
+
         if current_user.is_authenticated:
             blogs=Blog.query.filter_by(mail=current_user.email).all()
-            return render_template("index.html",blogs=blogs)
+            return render_template("index.html",blogs=blogs,isActive = True,allpost = False)
         blogs=Blog.query.all()
-        return render_template("index.html",blogs=blogs)
+        return render_template("index.html",blogs=blogs,isActive = False)
     except Exception as e:
         return f"Database is not connected {e} "
     
