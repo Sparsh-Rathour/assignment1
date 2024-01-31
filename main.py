@@ -331,6 +331,27 @@ def blogViewComment(id):
         flash("Comment is Uploaded","success")
     return redirect(url_for("blogView", id = blog_id_))
 
+@app.route('/delete/<int:id>' , methods=['GET'])
+def delete(id):
+    user_delete = Blog.query.get(id)
+    db.session.delete(user_delete)
+    db.session.commit()
+
+    return redirect(url_for('home'))
+
+@app.route('/updateBlog/<int:id>' , methods = ['GET','POST'])
+def updateBlog(id):
+
+
+    blogs = Blog.query.filter_by(bid = id)
+    return render_template('updateBlog.html', blog = blogs[0])
+
+
+
+
+    
+
+
 
 
 app.run(debug=True)
