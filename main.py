@@ -134,7 +134,7 @@ def home():
             blogs=Blog.query.filter_by(mail=current_user.email).all()
             return render_template("index.html",blogs=blogs,isActive = True,allpost = False)
         blogs=Blog.query.all()
-        return render_template("index.html",blogs=blogs,isActive = False)
+        return render_template("index.html",blogs=blogs,isActive = False, allpost=True)
     except Exception as e:
         return f"Database is not connected {e} "
     
@@ -314,22 +314,29 @@ def blogView(id):
     blogs=Blog.query.filter_by(bid=id).all()
     comments_ = Comments.query.filter_by(blog_id=id).all()
     print("Scsdvds")
-    print(blogs,comments_)
-    return render_template('blogview.html',blog = blogs, comments = comments_)
-    return "chjdsc"
+    name__= ''
+    if current_user.is_authenticated:
+        userdata=Signup.query.filter_by(email=current_user.email).first()
+        name__ =userdata.first_name +" "+userdata.last_name
+        print(name__)
+    
+    return render_template('blogview.html',blog = blogs, comments = comments_, username = name__)
 
 @app.route('/comment/<int:id>', methods=['POST'])
 def blogViewComment(id):
     if request.method == 'POST':
-        blog_id_ = id
-        comment_ = request.form.get('comment')
-        name_ = request.form.get('name')
-        date_ = datetime.now().strftime('%m/%d/%Y')
-        query=Comments(blog_id = blog_id_, comment = comment_, name = name_,date = date_)
-        db.session.add(query)
-        db.session.commit()
-        flash("Comment is Uploaded","success")
-    return redirect(url_for("blogView", id = blog_id_))
+        if current_user.is_authenticated:
+            blog_id_ = id
+            comment_ = request.form.get('comment')
+            name_ = request.form.get('name')
+            date_ = datetime.now().strftime('%m/%d/%Y')
+            query=Comments(blog_id = blog_id_, comment = comment_, name = name_,date = date_)
+            db.session.add(query)
+            db.session.commit()
+            flash("Comment is Uploaded","success")
+        else:
+            flash('Please Login to comment','info')
+    return redirect(url_for("blogView", id = id))
 
 @app.route('/delete/<int:id>' , methods=['GET'])
 def delete(id):
