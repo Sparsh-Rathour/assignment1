@@ -50,7 +50,7 @@ app.config['MAX_CONTENT_LENGTH']=16*1024*1024
 
 # database configuration
 # app.config['SQLALCHEMY_DATABASE_URI']='mysql://username:password@localhost/databasename'
-app.config['SQLALCHEMY_DATABASE_URI']='mssql+pyodbc://tap2023:tap2023@APINP-ELPTPMNRM\SQLEXPRESS/capstoneproject?driver=ODBC Driver 17 for SQL Server'
+app.config['SQLALCHEMY_DATABASE_URI']='mssql+pyodbc://tap2023:tap2023@APINP-ELPTYIXVW\SQLEXPRESS/capstoneproject?driver=ODBC Driver 17 for SQL Server'
 db=SQLAlchemy(app)
 
 
@@ -181,7 +181,19 @@ def signup():
     except Exception as e:
         return f"Database is not connected {e} "
     
+# @app.route("/test/")
+# def test():
+#     try:
+#         # query=Test.query.all()
+#         # print(query)
+#         sql_query="Select * from test"
+#         with db.engine.begin() as conn:
+#             response=conn.exec_driver_sql(sql_query).all()
+#             print(response)
+#         return f"Database is connected"
 
+#     except Exception as e:
+#         return f"Database is not connected {e} "
 
 @app.route("/login",methods=['GET','POST'])
 def login():
